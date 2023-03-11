@@ -1,0 +1,17 @@
+{% extends 'booking/book.html' %}
+{% block title %}Edit {% endblock %}
+{% block header %}
+<header class="panel-heading">
+    <h3><i class="fa fa-file-text-o"></i> Edit Reservation [ID{{record['id']}}]</h3>
+</header>
+{% endblock %}
+
+{% block script_extra %}
+<script>
+    window.onload = checkParticipant();
+    console.log({{ts}}, {{te}});
+    document.getElementById('time-input-start').value = '{{ ts }}';
+    document.getElementById('time-input-end').value = '{{ te }}';
+
+</script>
+{% endblock %}

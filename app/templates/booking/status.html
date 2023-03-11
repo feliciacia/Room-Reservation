@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<style>
+    .na {
+        background-color: red;
+        /* cursor: pointer; */
+    }
+</style>
+{% endblock %}
+{% block title %}Status {% endblock %}
+
+{% block content %}
+<div class="form-group">
+    <label>Date</label>
+    <input type="date" default="" id="date_rq">
+    <button href=# id="status"  onclick="updateTable()">Update</button>
+</div>
+
+<div>
+    <table id="schedule">
+        <tr>
+            <td>Time</td>
+            {% for i in range(1, no_of_rooms + 1) %}
+            <td>{{ "Room " ~i}}</td>
+            {% endfor %}
+        </tr>
+        {% for i in range(hours[0], hours[1]) %}
+        <tr>
+            <td>{{ i ~":00 - " ~ (i+1) ~ ":00"}}</td>
+            {% for r in range(1, no_of_rooms+1) %}
+            <td></td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    document.getElementById('date_rq').valueAsDate = new Date();
+
+    var list = {};
+    function ajaxCallBack(newVal){
+        list = newVal;
+    }
+
+    function fetchData(){
+        $.getJSON('{{url_for('booking.get_status')}}', {
+            date: $('input[id="date_rq"]').val()
+        }, function (data) {
+            // $("#resultDate").text(data);
+            // console.log(data);
+            ajaxCallBack(data);
+            console.log(list)
+            updateTable();
+        });
+        return false;
+    }
+
+    $('button#status')  .bind('click', fetchData);
+    $( window ).load(fetchData);
+    
+    var n_rows = [{{ hours[0] }}, {{ hours[1] }}];
+    var n_cols = {{no_of_rooms}};
+
+    function updateTable() {
+
+        var len = Object.keys(list).length;
+        var table = document.getElementById('schedule');
+
+        for (var i = n_rows[0]+1; i <= n_rows[1]; i++) {
+            for (var j = 1; j <= n_cols; j++) {
+                table.rows[i-n_rows[0]].cells[j].style.backgroundColor = "white";
+            }
+        }
+
+        // Traversing the JSON data
+        for(let i in list){
+            var c = parseInt(i);
+            for(let j in list[i]){
+                var r1 = parseInt(list[i][j][0]) + 1 - n_rows[0];
+                var te = parseInt(list[i][j][1]);
+                if (te == 0){
+                    te = 24;
+                }
+                var r2 = te + 1 - n_rows[0];
+                
+                for(let k = r1; k< r2;k++){
+                    table.rows[k].cells[c].innerHTML = "/NA";
+                    table.rows[k].cells[c].style.backgroundColor ="#F10";  
+                    table.rows[k].cells[c].style.color ="#FFF"; 
+                }
+            }
+        }
+    }
+
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block title %}New {% endblock %}
+{% block header %}
+<header class="panel-heading">
+    <h3><i class="fa fa-file-text-o"></i> New Reservation</h3>
+</header>
+{% endblock %}
+
+{% block content %}
+<form class="form" method="post">
+    <div class="col-lg-12">
+        <section class="panel">
+
+
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="control-label col-lg-2" for="inputSuccess">Subject</label>
+                    <div class="col-lg-10 radio">
+                        {{ form.subject() }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-lg-2">Message/Details</label>
+                    <div class="col-lg-10" >
+                        {{ form.message(placeholder="", class="form-control") }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-lg-2" for="inputSuccess">Room</label>
+                    <div class="col-lg-10 radio">
+                        {{ form.room_id() }}
+                    </div>
+                </div>
+
+                <div class="form-group" onfocus="showList()" onblur="hideList()">
+                    <label class="control-label col-lg-2" for="inputSuccess">Participants</label>
+                    {% if party|length > 0 %}
+                    <div class="col-lg-10" width=50 onblur="hideList()" tabindex="0">
+                        <div style="display: flex;">
+                            <div><input type="text" id="myInput" onfocus="searchName();showList();"
+                                    placeholder="Search for names.."></div>
+
+                            <!--Show checked participants, defaulted display: none, revealed when checked-->
+                            <div id="participant_list_txt">
+                                <ul id="party_list">
+                                    {% for participant in party %}
+                                    <li id="li2" style="display:none">{{ participant.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="party_checklist" style="display:none;">
+                            {{ form.party(onclick="checkParticipant()") }}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div  style="float:none;padding:0px 15px;color:red;"> Unavailable</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label class="control-label col-lg-2">Date</label>
+                    <div class="col-lg-10">
+                        {{ form.booked_date(placeholder="") }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-2">Time</label>
+                    <div class="col-lg-10">
+                        {{ form.time_start(placeholder="", id="time-input-start", onchange="incrementTime()") }} - {{ form.time_end(placeholder="", id="time-input-end", onchange="decrementTime()") }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-10">
+                    <input type="submit" class="btn btn-success" value="Submit">
+                    <input type="reset" class="btn btn-danger" value="Clear Form">
+                </div>
+            </div>
+        </section>
+    </div>
+    {{ form.csrf_token }}
+
+</form>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(function () {
+        var dtToday = new Date();
+
+        var month = dtToday.getMonth() + 1;
+        var day = dtToday.getDate();
+        var year = dtToday.getFullYear();
+        if (month < 10)
+            month = '0' + month.toString();
+        if (day < 10)
+            day = '0' + day.toString();
+
+        var maxDate = year + '-' + month + '-' + day;
+
+        $('#booked_date').attr('min', maxDate);
+    });
+
+    function showList() {
+        var div = document.getElementById('party_checklist');
+        div.style.display = "";
+    }
+    function hideList() {
+        var div = document.getElementById('party_checklist');
+        div.style.display = "none";
+    }
+
+    function searchName() {
+        // Declare variables
+        var input, filter, ul, li, i, txtValue;
+        input = document.getElementById('myInput');
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("party_checklist");
+        
+        try{
+            li = ul.getElementsByTagName('li');
+        }
+        catch (error){
+            return;
+        }
+            
+        // Loop through all list items, and hide those who don't match the search query
+        for (i = 0; i < li.length; i++) {
+
+            if (li[i].getElementsByTagName('input')[0].checked) {
+                console.log(li[i].textContent);
+            }
+            txtValue = li[i].textContent || li[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+    }
+
+    function checkParticipant() {
+        var ul, li, list, ul2, li2, i;
+        ul = document.getElementById("party_checklist");
+        ul2 = document.getElementById("party_list");
+
+        try{
+            li = ul.getElementsByTagName("li");
+            li2 = ul2.getElementsByTagName("li");
+        }
+        catch(error){
+            return;
+        }
+
+        list = document.getElementById("participant_list_txt");
+        for (i = 0; i < li2.length; i++) {
+
+            if (li[i].getElementsByTagName('input')[0].checked) {
+                console.log('checked');
+                li2[i].style.display = "";
+            }
+            else {
+                console.log('unchecked')
+                li2[i].style.display = "none";
+            }
+        }
+    }
+
+    function showSchedule() {
+        var x = document.getElementById("schedule");
+        if (x.style.display == "none") {
+            x.style.display = "";
+        } else {
+            x.style.display = "none";
+        }
+        var date = document.getElementById("booked_date");
+        console.log(date.value);
+    }
+
+    function incrementTime(){
+        var ts = document.getElementById("time-input-start");
+        var te = document.getElementById("time-input-end"); 
+        if (ts.value >= te.value){
+            te.value = parseInt(ts.value) + 1;
+        }
+    }
+    function decrementTime(){
+        var ts = document.getElementById("time-input-start");
+        var te = document.getElementById("time-input-end"); 
+        if (ts.value >= te.value){
+            ts.value = parseInt(te.value) - 1;
+        }
+    }
+</script>
+
+{% block script_extra %}
+{% endblock %}
+{% endblock %}

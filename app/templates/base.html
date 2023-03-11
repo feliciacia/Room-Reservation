@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}{% endblock %} Room-Reservation</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <!-- bootstrap theme -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-theme.css') }}">
+    <!--external css-->
+    <!-- font icon -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/elegant-icons-style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/v4-shims.css">
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style-responsive.css') }}" />
+    <link rel=”stylesheet” href=”https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css”rel=”nofollow”
+        integrity=”sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm” crossorigin=”anonymous”>
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <!-- container section start -->
+    <section id="container" class="">
+
+
+        <header class="header blue-bg">
+
+            <!--logo start-->
+            <!-- a href="media.php?module=media" class="logo" style="color:white"><span class="photo"><img src="img/logocon.png" style="margin-top:-10px"></span>Concertino </a -->
+            <a href="{{ url_for('booking.home') }}" class="logo" style="color:white">Room Reservation</a>
+            <!--logo end-->
+
+            <div class="nav main-row" id="top_menu">
+                <!--  search form start -->
+                <ul class="nav top-menu">
+
+                </ul>
+                <!--  search form end -->
+            </div>
+
+            <div class="top-nav notification-row">
+                <!-- notificatoin dropdown start-->
+                <ul class="nav pull-right top-menu">
+                    <!-- user login dropdown start-->
+                    <li class="dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span style='font-size:15px; color: white'>
+                                {% if current_user.is_authenticated %}
+                                <i class="fa fa-user-circle-o"></i> {{ current_user.name }}
+                                {% else %}
+                                Log In / Register
+                                {% endif %} <i class="fa fa-caret-down"></i></span>
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu extended Log In">
+                            <div class="log-arrow-up"></div>
+                            {% if current_user.is_authenticated %}
+                            <li>
+                                <a href="{{ url_for('auth.logout') }}"><i class="fa fa-sign-out"></i> Log Out</a>
+                            </li>
+                            {% else %}
+                            <li>
+                                <a data-toggle="modal" href="{{ url_for('auth.login') }}"><i class="fa fa-user"></i> Log
+                                    in</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="modal" href="{{ url_for('auth.register') }}"><i
+                                        class="fa fa-user-plus"></i> Register</a>
+                            </li>
+                            {% endif %}
+
+                        </ul>
+                    </li>
+                    <!-- user login dropdown end -->
+                </ul>
+                <!-- notificatoin dropdown end-->
+            </div>
+        </header>
+
+        <!-- loginModal -->
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <!-- loginForm -->
+                <form id="loginForm" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Login</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="loginUsername">Username</label>
+                            <input type="text" id="loginUsername" class="form-control" placeholder="Username..."
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" class="form-control" placeholder="Password..."
+                                required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </div>
+                </form>
+                <!-- loginForm end -->
+            </div>
+        </div>
+        <!-- loginModal end -->
+
+        <!-- signUpModal -->
+        <div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <!-- signUpForm -->
+                <form id="signUpForm" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Register</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="signUpUsername">Username</label>
+                            <input type="text" id="signUpUsername" class="form-control" placeholder="Username..."
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signUpEmail">Email</label>
+                            <input type="text" id="signUpEmail" class="form-control" placeholder="Email..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signUpPassword">Password</label>
+                            <input type="password" id="signUpPassword" class="form-control" placeholder="Password..."
+                                required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="modal-confirm">
+                            <i class="fas fa-user-plus"></i> Register
+                        </button>
+                    </div>
+                </form>
+                <!-- signUpForm end -->
+            </div>
+        </div>
+        <!-- signUpModal end -->
+
+        <!--header end-->
+
+        <!--sidebar start-->
+        <aside>
+            <div id="sidebar" class="nav-collapse">
+                <!-- sidebar menu start-->
+                <ul class="sidebar-menu">
+                    <li class="active">
+                        <a title="Home page" href="{{ url_for('booking.home') }}">
+                            <i class="fa fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="sub-menu">
+                        <a title="Make a reservation" href="{{ url_for('booking.book') }}">
+                            <i class="fa fa-file-text-o"></i> Reservation
+                        </a>
+                    </li>
+                    <li class="sub-menu">
+                        <a title="Edit a reservation" href="{{ url_for('booking.index') }}">
+                            <i class="fa fa-pencil-square-o"></i> Edit
+                        </a>
+                    </li>
+                    <li class="sub-menu">
+                        <a title="Check all rooms' status" href="{{ url_for('booking.status') }}">
+                            <i class="fa fa-th-list"></i> Room Status
+                        </a>
+                    </li>
+                    <li class="sub-menu">
+                        <a title="Check your history" href="{{ url_for('booking.profile') }}">
+                            <i class="fa fa-user-circle-o"></i> Profile
+                        </a>
+                    </li>
+                    </li>
+                </ul>
+                <!-- sidebar menu end-->
+            </div>
+        </aside>
+        <!--sidebar end-->
+
+        <!--main content start-->
+        <section id="main-content">
+            <section class="wrapper">
+                <header>
+                    {% block header %}{% endblock %}
+                </header>
+                {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="flash {{category}}">{{ message }}</div>
+                {%endfor%}
+                {% block content %}{% endblock %}
+
+                
+            </section>
+        </section>
+        <!--main content end-->
+    </section>
+    <div class="footer">
+        <p>@2021 Software Engineering</p>
+        <p> Group 21</p>
+    </div>
+    <!-- container section start -->
+
+    <!-- javascripts -->
+    <script src="{{ url_for('static', filename='js/jquery-1.8.3.min.js')}}"></script>
+    <!-- bootstrap -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <script>
+        $('#modal-confirm').click(function () {
+            // Perform the action after modal confirm button is clicked.
+            console.log("modal submit button")
+            $('#form-submit').click(); // submitting the form
+        });
+    </script>
+    {% block script %}{% endblock %}
+</body>
+
+</html>

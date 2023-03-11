@@ -1,0 +1,84 @@
+{% extends 'base.html'%}
+{% block title %}Profile{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
+{% endblock %}
+
+{% block header %}<h2>{{ current_user.name }}'s Profile</h2>{% endblock %}
+
+{% block content %}
+<div>
+    <h3>History</h3>
+    {% if records|length %}
+    <table>
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Room</td>
+                <td>Date</td>
+                <td>Time</td>
+                <td>Party</td>
+                <td>Booked by</td>
+                <td>Booking Time</td>
+                <td>Status</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% set status_str = ['Upcoming', 'Ongoing', 'Expired']%}
+            {% for record in records['own'] %}
+            <tr>
+                <td> ID{{ record['id'] }}</td>
+                <td>{{ record['room_id'] }} </td>
+                <td>{{ record['booked_date'] }}</td>
+                <td>{{ record['time_start'] }} - {{ record['time_end'] }}</td>
+                <td>
+                    {% for party in record['party'] %}
+                        {% set info = party.split(',') %}
+                        {{ info[1] }}({{ info[0]}})<br>
+                    {% endfor %}
+                </td>
+                <td>{{ record['username'] }} </td>
+                <td>{{ record['booking_time'].strftime('%Y-%m-%d (%H:%M)') }}</td>
+                <td>{{ status_str[record['status']] }}</td>
+            </tr>
+            {% endfor %}
+            {% for record in records['partied'] %}
+                <td> ID{{ record['id'] }}</td>
+                <td>{{ record['room_id'] }} </td>
+                <td>{{ record['booked_date'] }}</td>
+                <td>{{ record['time_start'] }} - {{ record['time_end'] }}</td>
+                <td>
+                    {% for party in record['party'] %}
+                        {% set info = party.split(',') %}
+                        {{ info[1] }}({{ info[0]}})<br>
+                    {% endfor %}
+                </td>
+                <td>{{ record['username'] }} </td>
+                <td>{{ record['booking_time'].strftime('%Y-%m-%d (%H:%M)') }}</td>
+                <td>{{ status_str[record['status']] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No records available<br><a href="{{url_for('booking.book')}}">Make a reservation</a></p>
+    {% endif %}
+</div>
+<div>
+    <h3>Options</h3>
+    <button class="action popup btn-danger" onclick="confirmDelete()">
+        Click here to delete account</buttton>
+        <span class="popuptext" id="popup">
+            <a class="action" style="color: white;" href="{{ url_for('auth.delete', id=current_user.id) }}">
+                Are you sure?</a>
+        </span>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    function confirmDelete() {
+        document.getElementById('popup').classList.toggle("show");
+    }
+</script>
+{% endblock %}

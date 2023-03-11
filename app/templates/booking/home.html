@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<!-- Custom styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style-responsive.css') }}">
+
+<h1>{% block title %}Welcome{% endblock %}</h1>
+
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <header class="panel-heading">
+            <p><em>A simple reservation system made for Software Engineering Project</em></p>
+        </header>
+        <div class="panel-body">
+            <p>Hover over the sidebar menu options for more details.</p>
+        </div>
+        <div class="panel-body">
+            {% if current_user.is_authenticated %}
+            <p><a href="{{ url_for('booking.book') }}">Start making reservations</a></p>
+            {% else %}
+            <p><a href="{{ url_for('auth.login') }}">Login</a> to start making reservations</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

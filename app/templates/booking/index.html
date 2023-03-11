@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
+{% endblock %}
+
+{% block header %}
+<h1>{% block title %}Records {% endblock %}</h1>
+{% if g.user %}
+<a class="action" href="{{ url_for('booking.book') }}">Make a Reservation</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% if records|length %}
+<div><p><em>Ongoing Reservations</em></p></div>
+<div>
+    <table class="reservation">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Room</td>
+                <td>Date</td>
+                <td>Time</td>
+                <td>Party</td>
+                <td>Booked by</td>
+                {% if current_user.is_authenticated and current_user.admin %}
+                <td>Status</td>
+                {% endif %}
+                <td colspan="2">Edit</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td> ID{{ record['id'] }}</td>
+                <td>{{ record['room_id'] }} </td>
+                <td>{{ record['booked_date'] }}</td>
+                <td>{{ record['time_start'] }} - {{ record['time_end'] }}</td>
+                <td>
+                    {% for party in record['party'] %}
+                        {% set info = party.split(',') %}
+                        {{ info[1] }}({{ info[0]}})<br>
+                    {% endfor %}
+                </td>
+                <td>{{ record['username'] }}</td>
+                {% if current_user and current_user.admin %}
+                <td>{{ record['status'] }}</td>
+                {% endif %}
+                {% if current_user.username == record['username'] or current_user.admin %}
+                <td><button class="action btn-warning"
+                        onclick="location.href='{{ url_for('booking.edit', id=record['id']) }}'">Edit</button>
+                </td>
+                <td><button class="action popup btn-danger" onclick="confirmCancel({{record['id']}})"
+                        >Cancel</buttton>
+                        <span class="popuptext" id="popup{{record['id']}}">
+                            <a class="action" style="color: white;" href="{{ url_for('booking.cancel', id=record['id'])
+                            }}">Confirm Cancellation?</a>
+                        </span>
+                </td>
+                {% else %}
+                <td colspan="2" class="col-lg-2" style="color: red;">/NA</td>
+                {% endif %}
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+{% else %}
+<div>No records available<br><a href="{{url_for('booking.book')}}">Make a reservation!</a></div>
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+<script>
+    function confirmCancel(recordID) {
+        document.getElementById("popup" + recordID).classList.toggle("show");
+    }
+</script>
+{% endblock %}
